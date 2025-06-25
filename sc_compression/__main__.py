@@ -80,8 +80,8 @@ def get_extension(file_path: str) -> str:
     return os.path.splitext(file_path)[1][1:]
 
 
-def join_filename(*parts, divider: str = ".") -> str:
-    return divider.join(part for part in parts if type(part) is str and len(part) > 0)
+def join_filename(*parts: str, divider: str = ".") -> str:
+    return divider.join(part for part in parts if len(part) > 0)
 
 
 def process_files(files: list[str], action: Callable[[bytes], bytes], suffix: str):

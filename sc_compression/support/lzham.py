@@ -20,7 +20,7 @@ class LZHAM:
         decompressed_path = mktemp(".lzham")
         if system(
             f"{path.dirname(__file__)}/lzham.exe "
-            f'-c -d{filters["dict_size_log2"]} '
+            f"-c -d{filters['dict_size_log2']} "
             f"d {temp_file_path} {decompressed_path} > nul 2>&1"
         ):
             remove(temp_file_path)
@@ -43,7 +43,7 @@ class LZHAM:
         compressed_path = mktemp(".lzham")
         if system(
             f"{path.dirname(__file__)}/lzham.exe "
-            f'-c -d{filters["dict_size_log2"]} '
+            f"-c -d{filters['dict_size_log2']} "
             f"c {temp_file_path} {compressed_path} > nul 2>&1"
         ):
             remove(temp_file_path)
