@@ -1,13 +1,15 @@
+import enum
 import re
-from enum import Enum
+from enum import IntEnum
 
-MAGIC_SC = b"SC"
-MAGIC_SCLZ = b"SCLZ"
-MAGIC_SIG = b"Sig:"
-MAGIC_ZSTD = b"\x28\xb5\x2f\xfd"
+MAGIC_SC: bytes = b"SC"
+MAGIC_SCLZ: bytes = b"SCLZ"
+MAGIC_SIG: bytes = b"Sig:"
+MAGIC_ZSTD: bytes = b"\x28\xb5\x2f\xfd"
 
 
-class Signatures(Enum):
+@enum.unique
+class Signatures(IntEnum):
     NONE = 0
     LZMA = 1
     SC = 2

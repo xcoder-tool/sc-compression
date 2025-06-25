@@ -1,69 +1,53 @@
-import struct
-from typing import Literal
+from struct import pack
+
+from .common import get_endian_sign, Endian
 
 
-ENDIAN_SIGN = {"big": ">", "little": "<"}
+class ByteWriter:
+    def __init__(self, endian: Endian):
+        self._buffer = bytearray()
+        self._endian_sign = get_endian_sign(endian)
 
+    def set_endian(self, endian: Endian) -> None:
+        self._endian_sign = get_endian_sign(endian)
 
-class Writer:
-    def __init__(self, endian: Literal["little", "big"] = "big"):
-        super(Writer, self).__init__()
+    def write(self, value: bytes) -> None:
+        self._buffer += value
 
-        self.endian: Literal["little", "big"] = endian
-        self.buffer = b""
+    def write_double(self, value: float) -> None:
+        self.write(pack(f"{self._endian_sign}d", value))
 
-    def write(self, data: bytes):
-        self.buffer += data
+    def write_float(self, value: float) -> None:
+        self.write(pack(f"{self._endian_sign}f", value))
 
-    def write_u_integer(self, integer: int, length: int = 1):
-        self.buffer += integer.to_bytes(length, self.endian, signed=False)
-
-    def write_integer(self, integer: int, length: int = 1):
-        self.buffer += integer.to_bytes(length, self.endian, signed=True)
-
-    def write_u_int64(self, integer: int) -> None:
-        self.write_u_integer(integer, 8)
+    def write_u_int64(self, integer: int):
+        self.write(pack(f"{self._endian_sign}Q", integer))
 
     def write_int64(self, integer: int) -> None:
-        self.write_integer(integer, 8)
-
-    def write_float(self, floating: float) -> None:
-        self.write(struct.pack(ENDIAN_SIGN[self.endian] + "f", floating))
+        self.write(pack(f"{self._endian_sign}q", integer))
 
     def write_u_int32(self, integer: int) -> None:
-        self.write_u_integer(integer, 4)
+        self.write(pack(f"{self._endian_sign}I", integer))
 
     def write_int32(self, integer: int) -> None:
-        self.write_integer(integer, 4)
-
-    def write_nu_int16(self, integer: int) -> None:
-        self.write_u_int16(integer * 65535)
+        self.write(pack(f"{self._endian_sign}i", integer))
 
     def write_u_int16(self, integer: int) -> None:
-        self.write_u_integer(integer, 2)
-
-    def write_n_int16(self, integer: int) -> None:
-        self.write_int16(integer * 32512)
+        self.write(pack(f"{self._endian_sign}H", integer))
 
     def write_int16(self, integer: int) -> None:
-        self.write_integer(integer, 2)
+        self.write(pack(f"{self._endian_sign}h", integer))
 
     def write_u_int8(self, integer: int) -> None:
-        self.write_u_integer(integer)
+        self.write(pack(f"{self._endian_sign}B", integer))
 
     def write_int8(self, integer: int) -> None:
-        self.write_integer(integer)
+        self.write(pack(f"{self._endian_sign}b", integer))
 
-    def write_bool(self, boolean: bool) -> None:
-        if boolean:
-            self.write_u_int8(1)
-        else:
-            self.write_u_int8(0)
+    @property
+    def buffer(self) -> bytes:
+        return self._buffer
 
-    def write_char(self, string: str) -> None:
-        self.buffer += string.encode("utf-8")
-
-    def write_string(self, string: str) -> None:
-        encoded = string.encode("utf-8")
-        self.write_u_int16(len(encoded))
-        self.buffer += encoded
+    @property
+    def position(self):
+        return len(self._buffer)

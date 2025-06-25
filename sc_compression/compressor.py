@@ -2,7 +2,7 @@ import lzma
 from hashlib import md5
 
 from sc_compression.signatures import Signatures
-from sc_compression.utils.writer import Writer
+from sc_compression.utils import ByteWriter
 
 try:
     import lzham
@@ -35,7 +35,11 @@ class Compressor:
     ]
 
     def compress(
-        self, data: bytes, signature: Signatures, file_version: int = None
+        self,
+        data: bytes,
+        signature: Signatures,
+        file_version: int = None,
+        metadata: bytes | None = None,
     ) -> bytes:
         uncompressed_size = len(data)
 
@@ -50,7 +54,7 @@ class Compressor:
         ):
             signature = Signatures.SC
 
-        writer = Writer("little")
+        writer = ByteWriter("little")
         if signature is Signatures.NONE:
             return data
         elif signature in (Signatures.LZMA, Signatures.SIG) or (
@@ -82,27 +86,45 @@ class Compressor:
         else:
             raise TypeError("Unknown Signature!")
 
-        compressed = self._write_header(compressed, data, file_version, signature)
+        compressed = self._write_header(
+            compressed, data, file_version, signature, metadata
+        )
 
         return compressed
 
     @staticmethod
     def _write_header(
-        compressed: bytes, data: bytes, file_version: int, signature: Signatures
+        compressed: bytes,
+        data: bytes,
+        file_version: int,
+        signature: Signatures,
+        metadata: bytes | None,
     ) -> bytes:
         if signature in (Signatures.SC, Signatures.SCLZ):
-            data_hash = md5(data).digest()
-
-            writer = Writer("big")
+            writer = ByteWriter("big")
             writer.write(b"SC")
-            writer.write_int32(file_version)
-            if file_version == 4:
-                writer.write_int32(1)
-            writer.write_int32(len(data_hash))
-            writer.write(data_hash)
+            if file_version <= 4:
+                writer.write_int32(file_version)
+                if file_version == 4:
+                    writer.write_int32(1)
+
+                data_hash = md5(data).digest()
+
+                writer.write_int32(len(data_hash))
+                writer.write(data_hash)
+            else:
+                writer.set_endian("little")
+                writer.write_int32(file_version)
+
+                if metadata is None:
+                    metadata = b""
+
+                writer.write_int32(len(metadata))
+                writer.write(metadata)
+
             return writer.buffer + compressed
         elif signature == Signatures.SIG:
-            writer = Writer("big")
+            writer = ByteWriter("big")
             writer.write(b"Sig:")
             writer.write(b"\x00" * 64)  # sha64
             return writer.buffer + compressed
