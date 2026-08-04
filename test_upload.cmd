@@ -1,1 +1,0 @@
-python -m twine upload --repository sc-compression-testpypi dist/*

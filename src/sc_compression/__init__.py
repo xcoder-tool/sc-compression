@@ -5,7 +5,9 @@ from .signatures import Signatures
 __all__ = ["Decompressor", "Compressor", "Signatures", "decompress", "compress"]
 
 
-def compress(buffer: bytes, signature: Signatures, file_version: int = None) -> bytes:
+def compress(
+    buffer: bytes, signature: Signatures, file_version: int | None = None
+) -> bytes:
     return Compressor().compress(buffer, signature, file_version)
 
 

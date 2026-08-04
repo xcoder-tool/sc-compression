@@ -1,0 +1,36 @@
+[project]
+name = "sc-compression"
+version = "0.6.7"
+description = "A module for compression like in Supercell games"
+readme = "README.md"
+authors = [{ name = "Danila Schelkov", email = "me@donutquine.dev" }]
+requires-python = ">=3.13"
+dependencies = ["bytestream"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/xcoder-tool/sc-compression"
+Repository = "https://github.com/xcoder-tool/sc-compression.git"
+Issues = "https://github.com/xcoder-tool/sc-compression/issues"
+
+[project.scripts]
+sc-compression = "sc_compression.__main__:main"
+
+[project.optional-dependencies]
+zstd = ["backports.zstd"]
+lzham = ["pylzham"]
+
+all = ["sc-compression[zstd,lzham]"]
+
+[build-system]
+requires = ["uv_build>=0.10.0,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+bytestream = { git = "https://github.com/xcoder-tool/bytestream-py" }

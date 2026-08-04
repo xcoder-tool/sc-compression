@@ -2,8 +2,7 @@ import argparse
 import os
 from typing import Callable
 
-from sc_compression import compress, decompress
-from sc_compression.signatures import Signatures
+from . import Signatures, compress, decompress
 
 
 def main() -> int:
