@@ -1,13 +1,15 @@
 import lzma
 from contextlib import suppress
 from hashlib import md5
-from typing import ClassVar, assert_never
+from typing import ClassVar, Literal, assert_never
 
 from bytestream import BinaryWriter
 
 from .exceptions import CompressionUnsupported
 from .signatures import MAGIC_SC, MAGIC_SCLZ, MAGIC_SIG, Signatures
 from .zstd import compress as zstd_compress
+
+type FileVersion = Literal[1, 2, 3, 4, 5, 6]
 
 
 class Compressor:
@@ -28,7 +30,7 @@ class Compressor:
         cls,
         data: bytes,
         signature: Signatures,
-        file_version: int,
+        file_version: FileVersion,
         metadata: bytes | None = None,
     ) -> bytes:
         compressed = cls._compress_internal(data, signature, file_version)
@@ -37,7 +39,7 @@ class Compressor:
 
     @classmethod
     def _compress_internal(
-        cls, data: bytes, signature: Signatures, file_version: int
+        cls, data: bytes, signature: Signatures, file_version: FileVersion
     ) -> bytes:
         writer = BinaryWriter("little")
         if signature is Signatures.NONE:
@@ -82,7 +84,7 @@ class Compressor:
     def _write_header(
         compressed: bytes,
         data: bytes,
-        file_version: int,
+        file_version: FileVersion,
         signature: Signatures,
         metadata: bytes | None,
     ) -> bytes:
