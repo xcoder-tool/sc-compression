@@ -1,6 +1,6 @@
 import os
 
-from sc_compression import decompress
+from sc_compression import Decompressor
 
 if not os.path.exists("in"):
     os.mkdir("in")
@@ -14,5 +14,5 @@ for filename in os.listdir("in"):
         file_data = f.read()
         f.close()
     with open("out/" + filename, "wb") as f:
-        f.write(decompress(file_data)[0])
+        f.write(Decompressor.decompress(file_data))
         f.close()

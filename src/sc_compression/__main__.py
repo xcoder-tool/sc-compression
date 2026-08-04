@@ -2,7 +2,7 @@ import argparse
 import os
 from typing import Callable
 
-from . import Signatures, compress, decompress
+from . import Compressor, Decompressor, Signatures
 
 
 def main() -> int:
@@ -43,7 +43,7 @@ def main() -> int:
     if args.decompress:
         process_files(
             args.files,
-            lambda data: decompress(data),
+            lambda data: Decompressor.decompress(data),
             args.suffix or "decompressed",
         )
     elif args.compress:
@@ -51,7 +51,7 @@ def main() -> int:
 
         process_files(
             args.files,
-            lambda data: compress(data, signature, 1),
+            lambda data: Compressor.compress(data, signature, 1),
             args.suffix or "compressed",
         )
     else:
