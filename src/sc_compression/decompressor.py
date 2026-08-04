@@ -13,6 +13,7 @@ from .signatures import (
     Signatures,
     get_signature,
 )
+from .zstd import decompress as zstd_decompress
 
 
 class Decompressor:
@@ -78,26 +79,7 @@ class Decompressor:
             case Signatures.ZSTD:
                 cls.check_magic(MAGIC_ZSTD, buffer=buffer)
 
-                with suppress(ImportError):
-                    from compression import zstd
-
-                    return zstd.decompress(buffer)
-
-                with suppress(ImportError):
-                    from backports import zstd
-
-                    return zstd.decompress(buffer)
-
-                with suppress(ImportError):
-                    import zstandard
-
-                    decompressor = zstandard.ZstdDecompressor()
-                    return decompressor.decompress(buffer)
-
-                raise CompressionUnsupported(
-                    "The 'zstd' extra is required for this module. "
-                    "Please install this library using: sc-compression[zstd]"
-                )
+                return zstd_decompress(buffer)
             case _:
                 assert_never(signature)
 

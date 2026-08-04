@@ -7,6 +7,7 @@ from bytestream import BinaryWriter
 
 from .exceptions import CompressionUnsupported
 from .signatures import MAGIC_SC, MAGIC_SCLZ, MAGIC_SIG, Signatures
+from .zstd import compress as zstd_compress
 
 
 class Compressor:
@@ -73,26 +74,7 @@ class Compressor:
                 "Please try to install this library using: sc-compression[lzham]"
             )
         elif signature in (Signatures.SC, Signatures.ZSTD):
-            with suppress(ImportError):
-                from compression import zstd
-
-                return zstd.compress(data)
-
-            with suppress(ImportError):
-                from backports import zstd
-
-                return zstd.compress(data)
-
-            with suppress(ImportError):
-                import zstandard
-
-                compressor = zstandard.ZstdCompressor()
-                compressed = compressor.compress(data)
-
-            raise CompressionUnsupported(
-                "The 'zstd' extra is required for this module. "
-                "Please try to install this library using: sc-compression[zstd] or update your Python to 3.14+ to use built-in compression.zstd library"
-            )
+            return zstd_compress(data)
         else:
             assert_never(signature)
 

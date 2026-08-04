@@ -43,7 +43,7 @@ def main() -> int:
     if args.decompress:
         process_files(
             args.files,
-            lambda data: decompress(data)[0],
+            lambda data: decompress(data),
             args.suffix or "decompressed",
         )
     elif args.compress:

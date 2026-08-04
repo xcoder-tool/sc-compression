@@ -1,6 +1,6 @@
 [project]
 name = "sc-compression"
-version = "0.6.7"
+version = "0.6.8"
 description = "A module for compression like in Supercell games"
 readme = "README.md"
 authors = [{ name = "Danila Schelkov", email = "me@donutquine.dev" }]
